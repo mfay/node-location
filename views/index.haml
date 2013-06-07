@@ -1,2 +1,8 @@
 %div
-	Hi there
+	:javascript
+		window.onload = function() {
+			navigator.geolocation.getCurrentPosition(showMap);
+		}
+		function showMap(position) {
+			alert(position);
+		}
