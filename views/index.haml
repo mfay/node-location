@@ -4,5 +4,10 @@
 			navigator.geolocation.getCurrentPosition(showMap);
 		}
 		function showMap(position) {
-			alert(position);
+			$("#lat").text(position.coords.latitude);
+			$("#lon").text(position.coords.longitude);
 		}
+%div{:id=>"lat"}
+	lat
+%div{:id=>"lon"}
+	lon
