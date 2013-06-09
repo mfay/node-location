@@ -1,13 +1,23 @@
 %div
 	:javascript
-		window.onload = function() {
-			navigator.geolocation.getCurrentPosition(showMap);
-		}
+		$(function(){
+			if (navigator.geolocation) {
+				navigator.geolocation.getCurrentPosition(showMap);
+				$("#holder").show();
+				$("#no_geo").hide();
+			} else {
+				$("#holder").hide();
+				$("#no_geo").show();
+			}
+		});
 		function showMap(position) {
 			$("#lat").text(position.coords.latitude);
 			$("#lon").text(position.coords.longitude);
 		}
-%div{:id=>"lat"}
-	lat
-%div{:id=>"lon"}
-	lon
+%div{:id=>"holder"}
+	%div{:id=>"lat"}
+		lat
+	%div{:id=>"lon"}
+		lon
+%div{:id=>"no_geo"}
+	Your browser does not support geolocation.
