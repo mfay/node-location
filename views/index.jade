@@ -1,23 +1,51 @@
-extends layout
+extends map_layout
 
 block content
+	style().
+		html {
+			width: 100%;
+		}
+		body {
+			width: 100%;
+			margin: 0 0 0 0;
+		}
+		#map-canvas {
+			width: 100%;
+			height: 100%;
+		}
+	script(src="//maps.googleapis.com/maps/api/js?key=AIzaSyDrF6CcNk_9hJhxbhwob-lUtoX6DRSa04Q&sensor=true", type="text/javascript")
 	script(type="text/javascript").
 		$(function(){
 			if (navigator.geolocation) {
 				navigator.geolocation.getCurrentPosition(showMap);
-				$("#holder").show();
-				$("#no_geo").hide();
-			} else {
-				$("#holder").hide();
-				$("#no_geo").show();
 			}
 		});
 		function showMap(position) {
-			$("#lat").text(position.coords.latitude);
-			$("#lon").text(position.coords.longitude);
+			var myLatlng = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+
+			$("#map-canvas").width($(document).width());
+			$("#map-canvas").height($(document).height());
+
+			var mapOptions = {
+				center: myLatlng,
+				zoom: 10,
+				mapTypeId: google.maps.MapTypeId.ROADMAP
+			};
+			var map = new google.maps.Map(document.getElementById("map-canvas"),
+					mapOptions);
+			var marker = new google.maps.Marker({
+				position: myLatlng,
+				map: map,
+				title: "You are here"
+			});
 		}
-	h3 Your location
-	div() Latitude:
-	div(id="lat")
-	div Longitude: 
-	div(id="lon")
+		function initialize() {
+			var mapOptions = {
+				center: new google.maps.LatLng(-34.397, 150.644),
+				zoom: 8,
+				mapTypeId: google.maps.MapTypeId.ROADMAP
+			};
+			var map = new google.maps.Map(document.getElementById("map-canvas"),
+					mapOptions);
+		}
+	div(id="map-canvas")
