@@ -1,5 +1,24 @@
 extends layout
 
 block content
+	script(type="text/javascript").
+		$(function(){
+			if (navigator.geolocation) {
+				navigator.geolocation.getCurrentPosition(showMap);
+				$("#holder").show();
+				$("#no_geo").hide();
+			} else {
+				$("#holder").hide();
+				$("#no_geo").show();
+			}
+		});
+		function showMap(position) {
+			$("#lat").text(position.coords.latitude);
+			$("#lon").text(position.coords.longitude);
+		}
+
   h1= title
-  p Welcome to #{title}
+  div
+  	Latitude: span(id="lat")
+  div
+  	Longitude: span(id="long")
