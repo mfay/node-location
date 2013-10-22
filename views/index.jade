@@ -31,13 +31,22 @@ block content
 				zoom: 10,
 				mapTypeId: google.maps.MapTypeId.ROADMAP
 			};
-			var map = new google.maps.Map(document.getElementById("map-canvas"),
-					mapOptions);
-			var marker = new google.maps.Marker({
-				position: myLatlng,
-				map: map,
-				title: "You are here"
-			});
+			var map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
+			var mybounds = new google.maps.LatLngBounds();
+			addMarker(position.coords.latitude, position.coords.longitude, map, mybounds, "images/smart.png");
+			addMarker(42.71, -84.82, map, mybounds);
+			addMarker(40.8049, -89.4425, map, mybounds);
+			
+			map.fitBounds(mybounds);
+		}
+		function addMarker(lat, lng, map, bounds, image) {
+			var ll = new google.maps.LatLng(lat, lng);
+			bounds.extend(ll);
+			if (image === undefined) {
+				new google.maps.Marker({position: ll, map: map});
+			} else {
+				new google.maps.Marker({position: ll, map: map, icon: image});
+			}
 		}
 		function initialize() {
 			var mapOptions = {
