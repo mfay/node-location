@@ -15,46 +15,63 @@ block content
 		}
 	script(src="//maps.googleapis.com/maps/api/js?key=AIzaSyDrF6CcNk_9hJhxbhwob-lUtoX6DRSa04Q&sensor=true", type="text/javascript")
 	script(type="text/javascript").
-		$(function(){
-			if (navigator.geolocation) {
-				navigator.geolocation.getCurrentPosition(showMap);
-			}
-		});
-		function showMap(position) {
-			var myLatlng = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+		
+		var info = (function(){
+			return {
+				mapOptions: {
+						zoom: 12,
+						center: new google.maps.LatLng(42.88094, -85.56425),
+						mapTypeId: google.maps.MapTypeId.ROADMAP
+				},
+				buildMap: function(options) {
+					this.bounds = new google.maps.LatLngBounds();
+					this.map = new google.maps.Map(document.getElementById("map-canvas"), options||this.mapOptions);		
+				},
+				addMarker: function(lat, lng, image) {
+					var ll = new google.maps.LatLng(lat, lng);
+					this.bounds.extend(ll);
+					this.map.fitBounds(info.bounds);
+					return new google.maps.Marker({position: ll, map: this.map, icon: image});
+				},
+				setCurrent: function(lat, lng) {
+					var newll = new google.maps.LatLng(lat, lng);
+					if (this.inSameSpot(newll)) return;
+					this.ll = newll;
+					this.clear();
+					this.mymarker = this.addMarker(lat, lng, "images/smart.png");
+				},
+				clear: function(){
+					if (this.mymarker === undefined) return;
+					this.mymarker.setMap(null);
+				},
+				inSameSpot: function(ll) {
+					if (this.ll === undefined) return false;
+					var clat = this.round(this.ll.lb);
+					var clng = this.round(this.ll.mb);
+					var lat = this.round(ll.lb);
+					var lng = this.round(ll.mb);
+					return clat === lat && clng === lng;
+				},
+				round: function(num) {
+					return Math.round((num*1000))/1000;
+				}
+			};
+		})();
 
+		$(function(){
 			$("#map-canvas").width($(document).width());
 			$("#map-canvas").height($(document).height());
 
-			var mapOptions = {
-				center: myLatlng,
-				zoom: 10,
-				mapTypeId: google.maps.MapTypeId.ROADMAP
-			};
-			var map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
-			var mybounds = new google.maps.LatLngBounds();
-			addMarker(position.coords.latitude, position.coords.longitude, map, mybounds, "images/smart.png");
-			addMarker(42.71, -84.82, map, mybounds);
-			addMarker(40.8049, -89.4425, map, mybounds);
-			
-			map.fitBounds(mybounds);
-		}
-		function addMarker(lat, lng, map, bounds, image) {
-			var ll = new google.maps.LatLng(lat, lng);
-			bounds.extend(ll);
-			if (image === undefined) {
-				new google.maps.Marker({position: ll, map: map});
-			} else {
-				new google.maps.Marker({position: ll, map: map, icon: image});
+			info.buildMap();
+			info.addMarker(42.88094, -85.56425);
+			if (navigator.geolocation) {
+				navigator.geolocation.getCurrentPosition(showMap);
+				setInterval(function(){
+					navigator.geolocation.getCurrentPosition(showMap);
+				}, 5000);
 			}
-		}
-		function initialize() {
-			var mapOptions = {
-				center: new google.maps.LatLng(-34.397, 150.644),
-				zoom: 8,
-				mapTypeId: google.maps.MapTypeId.ROADMAP
-			};
-			var map = new google.maps.Map(document.getElementById("map-canvas"),
-					mapOptions);
+		});
+		function showMap(position) {
+			info.setCurrent(position.coords.latitude, position.coords.longitude);
 		}
 	div(id="map-canvas")
